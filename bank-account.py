@@ -1,13 +1,14 @@
 import csv
+import time
 
 class Account:
     account_no_counter = 0
 
-    def __init__(self, first_name, last_name, pin_no):
+    def __init__(self, first_name, last_name, pin_no, balance):
         self.first_name = first_name
         self.last_name = last_name
         self.pin_no= pin_no
-        self.balance = 0
+        self.balance = balance
         Account.account_no_counter +=1 
         self.account_no = Account.account_no_counter
 
@@ -38,6 +39,18 @@ def create_account():
 
 def deposit_money():
     account_no = input("Please enter account number: ")
+    with open("bank_accounts.csv", "r") as accounts_file:
+        csvreader = csv.reader(accounts_file)
+        for account_entry in csvreader:
+            if account_entry[0] == account_no:
+                account = Account(account_entry[1], account_entry[2], account_entry[3], int(account_entry[4]))
+                print("Account found")
+                deposit_amount = int(input("Please enter deposit amount: "))
+                account.deposit(deposit_amount)
+                print(f"Money deposited. New balance is {account.balance}")
+                return
+        return "Account not found"
+        
 
         
 def main():
@@ -48,6 +61,7 @@ def main():
 
     if home_screen_input == 2:
         deposit_money()
+        time.sleep(10)
 
 if __name__ == "__main__":
     main()
