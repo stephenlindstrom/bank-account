@@ -18,9 +18,21 @@ class Account:
         else:
             raise Exception("Not enough funds")
 
+def display_home_screen():
+    print("1. Create new bank account")
+    print("2. Deposit money")
+    print("3. Withdraw money")
+        
+def main():
+    display_home_screen()
+
+if __name__ == "__main__":
+    main()
+"""
 account_1 = Account("Stephen", "Lindstrom", 1234)
 account_2 = Account("John", "Doe", 1111)
 account_1.deposit(100)
 account_1.withdraw(50)
 print(account_1.account_no)
 print(account_2.account_no)
+"""
