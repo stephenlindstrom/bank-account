@@ -6,10 +6,12 @@ class Account:
         self.balance = self.balance + deposit_amount
 
     def withdraw(self, withdraw_amount):
-        self.balance = self.balance - withdraw_amount
-
+        if self.balance > withdraw_amount:
+            self.balance = self.balance - withdraw_amount
+        else:
+            raise Exception("Not enough funds")
 
 account_1 = Account()
 account_1.deposit(100)
-account_1.withdraw(50)
+account_1.withdraw(150)
 print(account_1.balance)
