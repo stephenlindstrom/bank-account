@@ -45,12 +45,18 @@ def deposit_money():
             if account_entry[0] == account_no:
                 account = Account(account_entry[1], account_entry[2], account_entry[3], int(account_entry[4]))
                 print("Account found")
-                deposit_amount = int(input("Please enter deposit amount: "))
-                account.deposit(deposit_amount)
-                print(f"Money deposited. New balance is {account.balance}")
-                return
-        return "Account not found"
-        
+                break
+
+    with open("bank_accounts.csv", "w") as accounts_file:
+        csvwriter = csv.writer(accounts_file)
+        deposit_amount = int(input("Please enter deposit amount: "))
+        account.deposit(deposit_amount)
+        print(f"Money deposited. New balance is {account.balance}")
+
+
+def withdraw_money():
+    account_no = input("Please enter account number: ")
+    
 
         
 def main():
