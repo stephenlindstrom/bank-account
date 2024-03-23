@@ -1,10 +1,11 @@
 import csv
 import time
+import psycopg2
 
 class Account:
     account_no_counter = 0
 
-    def __init__(self, first_name, last_name, pin_no, balance):
+    def __init__(self, first_name, last_name, pin_no, balance=0):
         self.first_name = first_name
         self.last_name = last_name
         self.pin_no= pin_no
@@ -26,16 +27,25 @@ def display_home_screen():
     print("2. Deposit money")
     print("3. Withdraw money")
 
-def create_account():
+def get_account_owner_info():
     first_name = input("Please enter first name: ")
     last_name = input("Please enter last name: ")
     pin_no = input("Please enter four digit pin number: ")
     account = Account(first_name, last_name, pin_no)
-    
-    with open("bank_accounts.csv", 'w') as accounts_file:
-        csvwriter = csv.writer(accounts_file)
-        csvwriter.writerow([account.account_no, account.first_name, account.last_name, account.pin_no, account.balance])
+    return account
 
+def add_account_to_database(account):
+    conn = psycopg2.connect(host="127.0.0.1", dbname="bank", user="postgres", password="hello", port=5432)
+    
+    conn.cursor().execute("""
+                          INSERT INTO account (first_name, last_name, pin_no)
+                          VALUES (%s, %s, %s);
+                          """,
+                          (account.first_name, account.last_name, account.pin_no))
+    
+    conn.commit()
+    conn.cursor().close()
+    conn.close()
 
 def deposit_money():
     account_no = input("Please enter account number: ")
@@ -56,14 +66,15 @@ def deposit_money():
 
 def withdraw_money():
     account_no = input("Please enter account number: ")
-    
+
 
         
 def main():
     display_home_screen()
     home_screen_input = int(input("Please select option from above: "))
     if home_screen_input == 1:
-        create_account()
+        account = get_account_owner_info()
+        add_account_to_database(account)
 
     if home_screen_input == 2:
         deposit_money()
