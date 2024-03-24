@@ -47,6 +47,29 @@ def add_account_to_database(account):
     conn.cursor().close()
     conn.close()
 
+def get_account_no():
+    account_no = input("Please enter account number: ")
+    return account_no
+
+def account_exists(account_no):
+    conn = psycopg2.connect(host="127.0.0.1", dbname="bank", user="postgres", password="hello", port=5432)
+
+    cur = conn.cursor()
+    
+    cur.execute("SELECT * FROM account WHERE id=%s;", (account_no))
+    account_record= cur.fetchone()
+
+    conn.commit()
+    cur.close()
+    conn.close()
+
+    print(account_record)
+
+
+def get_deposit_amount():
+    deposit_amount = input("Please enter deposit amount: ")
+    return deposit_amount
+
 def deposit_money():
     account_no = input("Please enter account number: ")
     with open("bank_accounts.csv", "r") as accounts_file:
@@ -77,8 +100,9 @@ def main():
         add_account_to_database(account)
 
     if home_screen_input == 2:
-        deposit_money()
-        time.sleep(10)
+        account_no = get_account_no()
+        account_exists(account_no)
+
 
 if __name__ == "__main__":
     main()
