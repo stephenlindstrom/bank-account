@@ -2,6 +2,12 @@ import csv
 import time
 import psycopg2
 
+
+NEW_ACCOUNT = 1
+DEPOSIT = 2
+WITHDRAW = 3
+
+
 class Account:
     def __init__(self, first_name, last_name, pin_no, balance=0, id=0):
         self.first_name = first_name
@@ -19,14 +25,12 @@ class Account:
         else:
             raise Exception("Not enough funds")
 
+
 def display_home_screen():
     print("1. Create new bank account")
     print("2. Deposit money")
     print("3. Withdraw money")
 
-NEW_ACCOUNT = 1
-DEPOSIT = 2
-WITHDRAW = 3
 
 def get_account_owner_info():
     first_name = input("Please enter first name: ")
@@ -34,6 +38,7 @@ def get_account_owner_info():
     pin_no = input("Please enter four digit pin number: ")
     account = Account(first_name, last_name, pin_no)
     return account
+
 
 def add_account_to_database(account):
     conn = psycopg2.connect(host="127.0.0.1", dbname="bank", user="postgres", password="hello", port=5432)
@@ -48,9 +53,11 @@ def add_account_to_database(account):
     conn.cursor().close()
     conn.close()
 
+
 def get_account_no():
     account_no = input("Please enter account number: ")
     return account_no
+
 
 def account_exists(account_no):
     conn = psycopg2.connect(host="127.0.0.1", dbname="bank", user="postgres", password="hello", port=5432)
@@ -68,6 +75,7 @@ def account_exists(account_no):
         return False
     else:
         return True
+    
 
 def create_account_object(account_no):
     conn = psycopg2.connect(host="127.0.0.1", dbname="bank", user="postgres", password="hello", port=5432)
@@ -83,19 +91,25 @@ def create_account_object(account_no):
     account = Account(account_record[1], account_record[2], account_record[3], account_record[4], account_record[0])
     return account
 
+
 def validate_pin_no(account):
     pin_no = input("Please provide pin number: ")
     if pin_no == account.pin_no:
         return True
     else:
         return False
+    
 
-def get_deposit_amount():
-    deposit_amount = int(input("Please enter deposit amount: "))
-    return deposit_amount
+def get_transaction_amount():
+    transaction_amount = int(input("Please enter transaction amount: "))
+    return transaction_amount
 
-def deposit_to_account(account, deposit_amount):
-    account.deposit(deposit_amount)
+
+def update_account_balance(account, transaction_amount, transaction_type):
+    if transaction_type == DEPOSIT:
+        account.deposit(transaction_amount)
+    else:
+        account.withdraw(transaction_amount)
 
     conn = psycopg2.connect(host="127.0.0.1", dbname="bank", user="postgres", password="hello", port=5432)
 
@@ -112,29 +126,32 @@ def deposit_to_account(account, deposit_amount):
     conn.close()
 
 
-def withdraw_money():
-    account_no = input("Please enter account number: ")
-
+def execute_transaction(transaction_type):
+    account_no = get_account_no()
+    if account_exists(account_no):
+        account = create_account_object(account_no)
+        if validate_pin_no(account):
+            transaction_amount = get_transaction_amount()
+            update_account_balance(account, transaction_amount, transaction_type)
+        else:
+            print("Invalid pin number")
+    else:
+        print("Account does not exist")
 
         
 def main():
     display_home_screen()
     home_screen_input = int(input("Please select option from above: "))
+    
     if home_screen_input == NEW_ACCOUNT:
         account = get_account_owner_info()
         add_account_to_database(account)
 
     if home_screen_input == DEPOSIT:
-        account_no = get_account_no()
-        if account_exists(account_no):
-            account = create_account_object(account_no)
-            if validate_pin_no(account):
-                deposit_amount = get_deposit_amount()
-                deposit_to_account(account, deposit_amount)
-            else:
-                print("Invalid pin number")
-        else:
-            print("Account does not exist")
+        execute_transaction(DEPOSIT)
+    
+    if home_screen_input == WITHDRAW:
+        execute_transaction(WITHDRAW)
 
 
 if __name__ == "__main__":
