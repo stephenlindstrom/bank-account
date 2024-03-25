@@ -131,28 +131,27 @@ def update_account_balance(account, transaction_amount, transaction_type):
     conn.close()
 
 
-def execute_transaction(transaction_type):
+def get_verified_account():
     account_no = get_account_no()
     if account_exists(account_no):
         account = create_account_object(account_no)
         if validate_pin_no(account):
-            transaction_amount = get_transaction_amount()
-            update_account_balance(account, transaction_amount, transaction_type)
+            return account
         else:
-            print("Invalid pin number")
+            raise Exception("Invalid pin number")
     else:
-        print("Account does not exist")
+        raise Exception("Account not found")
+
+
+def execute_transaction(transaction_type):
+    account = get_verified_account()
+    transaction_amount = get_transaction_amount()
+    update_account_balance(account, transaction_amount, transaction_type)
+
 
 def view_account():
-    account_no = get_account_no()
-    if account_exists(account_no):
-        account = create_account_object(account_no)
-        if validate_pin_no(account):
-            print(f"Hello, {account.first_name}! Your account balance is {account.balance}")
-        else:
-            print("Invalid pin number")
-    else:
-        print("Account does not exist")
+    account = get_verified_account()
+    print(f"Hello, {account.first_name}! Your account balance is {account.balance}")
 
         
 def main():
