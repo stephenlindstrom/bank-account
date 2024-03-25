@@ -143,6 +143,17 @@ def execute_transaction(transaction_type):
     else:
         print("Account does not exist")
 
+def view_account():
+    account_no = get_account_no()
+    if account_exists(account_no):
+        account = create_account_object(account_no)
+        if validate_pin_no(account):
+            print(f"Hello, {account.first_name}! Your account balance is {account.balance}")
+        else:
+            print("Invalid pin number")
+    else:
+        print("Account does not exist")
+
         
 def main():
     while True:
@@ -160,10 +171,11 @@ def main():
             execute_transaction(WITHDRAW)
 
         if home_screen_input == VIEW_ACCOUNT:
+            view_account()
         
         if home_screen_input == QUIT:
             sys.exit()
-            
+
 
 if __name__ == "__main__":
     main()
