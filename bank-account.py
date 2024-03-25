@@ -1,11 +1,14 @@
 import csv
 import time
 import psycopg2
+import sys
 
 
 NEW_ACCOUNT = 1
 DEPOSIT = 2
 WITHDRAW = 3
+VIEW_ACCOUNT = 4
+QUIT = 5
 
 
 class Account:
@@ -30,6 +33,8 @@ def display_home_screen():
     print("1. Create new bank account")
     print("2. Deposit money")
     print("3. Withdraw money")
+    print("4. View account")
+    print("5. Quit")
 
 
 def get_account_owner_info():
@@ -140,19 +145,25 @@ def execute_transaction(transaction_type):
 
         
 def main():
-    display_home_screen()
-    home_screen_input = int(input("Please select option from above: "))
-    
-    if home_screen_input == NEW_ACCOUNT:
-        account = get_account_owner_info()
-        add_account_to_database(account)
+    while True:
+        display_home_screen()
+        home_screen_input = int(input("Please select option from above: "))
+        
+        if home_screen_input == NEW_ACCOUNT:
+            account = get_account_owner_info()
+            add_account_to_database(account)
 
-    if home_screen_input == DEPOSIT:
-        execute_transaction(DEPOSIT)
-    
-    if home_screen_input == WITHDRAW:
-        execute_transaction(WITHDRAW)
+        if home_screen_input == DEPOSIT:
+            execute_transaction(DEPOSIT)
+        
+        if home_screen_input == WITHDRAW:
+            execute_transaction(WITHDRAW)
 
+        if home_screen_input == VIEW_ACCOUNT:
+        
+        if home_screen_input == QUIT:
+            sys.exit()
+            
 
 if __name__ == "__main__":
     main()
