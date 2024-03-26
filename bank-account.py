@@ -1,7 +1,6 @@
-import csv
-import time
 import psycopg2
 import sys
+import hashlib
 
 
 NEW_ACCOUNT = 1
@@ -45,6 +44,12 @@ def get_account_owner_info():
     return account
 
 
+def hash_pin_no(pin_no):
+    pin_no_bytes = pin_no.encode('utf-8')
+    hash_object = hashlib.sha256(pin_no_bytes)
+    return hash_object.hexdigest()
+
+
 def add_account_to_database(account):
     conn = psycopg2.connect(host="127.0.0.1", dbname="bank", user="postgres", password="hello", port=5432)
     
@@ -74,7 +79,7 @@ def account_exists(account_no):
 
     cur = conn.cursor()
     
-    cur.execute("SELECT * FROM account WHERE id=%s;", (account_no))
+    cur.execute("SELECT * FROM account WHERE id=%s;", (account_no, ))
     account_record= cur.fetchone()
 
     conn.commit()
@@ -92,7 +97,7 @@ def create_account_object(account_no):
 
     cur = conn.cursor()
     
-    cur.execute("SELECT * FROM account WHERE id=%s;", (account_no))
+    cur.execute("SELECT * FROM account WHERE id=%s;", (account_no, ))
     account_record = cur.fetchone()
 
     conn.commit()
@@ -104,7 +109,7 @@ def create_account_object(account_no):
 
 def validate_pin_no(account):
     pin_no = input("Please provide pin number: ")
-    if pin_no == account.pin_no:
+    if hash_pin_no(pin_no) == account.pin_no:
         return True
     else:
         return False
@@ -166,6 +171,7 @@ def main():
         
         if home_screen_input == NEW_ACCOUNT:
             account = get_account_owner_info()
+            account.pin_no = hash_pin_no(account.pin_no)
             add_account_to_database(account)
 
         if home_screen_input == DEPOSIT:
