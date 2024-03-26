@@ -48,14 +48,19 @@ def get_account_owner_info():
 def add_account_to_database(account):
     conn = psycopg2.connect(host="127.0.0.1", dbname="bank", user="postgres", password="hello", port=5432)
     
-    conn.cursor().execute("""
+    cur = conn.cursor()
+    cur.execute("""
                           INSERT INTO account (first_name, last_name, pin_no)
-                          VALUES (%s, %s, %s);
+                          VALUES (%s, %s, %s) RETURNING id;
                           """,
                           (account.first_name, account.last_name, account.pin_no))
     
+    account_id = cur.fetchone()
+    print(f"Account created. Your account number is {account_id[0]}")
+    
     conn.commit()
-    conn.cursor().close()
+
+    cur.close()
     conn.close()
 
 
